@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nemo.collections.llm.gpt.model.baichuan import Baichuan2Config, Baichuan2Config7B, Baichuan2Model
+from nemo.collections.llm.gpt.model.baichuan import (
+    Baichuan2Config,
+    Baichuan2Config7B,
+    Baichuan2Model,
+)
 from nemo.collections.llm.gpt.model.base import (
     GPTConfig,
     GPTConfig5B,
@@ -29,7 +33,12 @@ from nemo.collections.llm.gpt.model.base import (
     transformer_engine_full_layer_spec,
     transformer_engine_layer_spec,
 )
-from nemo.collections.llm.gpt.model.chatglm import ChatGLM2Config6B, ChatGLM3Config6B, ChatGLMConfig, ChatGLMModel
+from nemo.collections.llm.gpt.model.chatglm import (
+    ChatGLM2Config6B,
+    ChatGLM3Config6B,
+    ChatGLMConfig,
+    ChatGLMModel,
+)
 from nemo.collections.llm.gpt.model.deepseek import (
     DeepSeekModel,
     DeepSeekV2Config,
@@ -59,8 +68,12 @@ from nemo.collections.llm.gpt.model.gemma3 import (
     Gemma3Config27B,
     Gemma3Model,
 )
-from nemo.collections.llm.gpt.model.hf_auto_model_for_causal_lm import HFAutoModelForCausalLM
-from nemo.collections.llm.gpt.model.hf_llama_embedding import get_llama_bidirectional_hf_model
+from nemo.collections.llm.gpt.model.hf_auto_model_for_causal_lm import (
+    HFAutoModelForCausalLM,
+)
+from nemo.collections.llm.gpt.model.hf_llama_embedding import (
+    get_llama_bidirectional_hf_model,
+)
 from nemo.collections.llm.gpt.model.hyena import (
     Hyena1bConfig,
     Hyena7bARCLongContextConfig,
@@ -109,7 +122,11 @@ from nemo.collections.llm.gpt.model.llama_nemotron import (
     Llama33NemotronSuper49BConfig,
     LlamaNemotronModel,
 )
-from nemo.collections.llm.gpt.model.mistral import MistralConfig7B, MistralModel, MistralNeMoConfig12B
+from nemo.collections.llm.gpt.model.mistral import (
+    MistralConfig7B,
+    MistralModel,
+    MistralNeMoConfig12B,
+)
 from nemo.collections.llm.gpt.model.mixtral import (
     MixtralConfig,
     MixtralConfig8x3B,
@@ -122,11 +139,16 @@ from nemo.collections.llm.gpt.model.nemotron import (
     Nemotron3Config8B,
     Nemotron3Config22B,
     Nemotron4Config15B,
+    Nemotron4Config10B,
     Nemotron4Config340B,
     NemotronConfig,
     NemotronModel,
 )
-from nemo.collections.llm.gpt.model.phi3mini import Phi3Config, Phi3ConfigMini, Phi3Model
+from nemo.collections.llm.gpt.model.phi3mini import (
+    Phi3Config,
+    Phi3ConfigMini,
+    Phi3Model,
+)
 from nemo.collections.llm.gpt.model.qwen2 import (
     Qwen2Config,
     Qwen2Config1P5B,
@@ -167,7 +189,11 @@ from nemo.collections.llm.gpt.model.ssm import (
     NVIDIAMambaHybridConfig8B,
     SSMConfig,
 )
-from nemo.collections.llm.gpt.model.starcoder import StarcoderConfig, StarcoderConfig15B, StarcoderModel
+from nemo.collections.llm.gpt.model.starcoder import (
+    StarcoderConfig,
+    StarcoderConfig15B,
+    StarcoderModel,
+)
 from nemo.collections.llm.gpt.model.starcoder2 import (
     Starcoder2Config,
     Starcoder2Config3B,
@@ -224,6 +250,7 @@ __all__ = [
     "Nemotron3Config4B",
     "Nemotron3Config8B",
     "Nemotron4Config15B",
+    "Nemotron4Config10B",
     "Nemotron3Config22B",
     "Nemotron4Config340B",
     "NemotronModel",

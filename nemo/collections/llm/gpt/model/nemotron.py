@@ -20,7 +20,11 @@ import torch
 from torch import nn
 
 from nemo.collections.llm.fn.activation import squared_relu
-from nemo.collections.llm.gpt.model.base import GPTConfig, GPTModel, torch_dtype_from_mcore_config
+from nemo.collections.llm.gpt.model.base import (
+    GPTConfig,
+    GPTModel,
+    torch_dtype_from_mcore_config,
+)
 from nemo.collections.llm.utils import Config
 from nemo.lightning import OptimizerModule, io, teardown
 from nemo.lightning.io.state import TransformFns
@@ -30,7 +34,9 @@ if TYPE_CHECKING:
     from transformers import NemotronConfig as HFNemotronConfig
     from transformers import NemotronForCausalLM
 
-    from nemo.collections.common.tokenizers.huggingface.auto_tokenizer import AutoTokenizer
+    from nemo.collections.common.tokenizers.huggingface.auto_tokenizer import (
+        AutoTokenizer,
+    )
     from nemo.collections.common.tokenizers.tokenizer_spec import TokenizerSpec
 
 
@@ -133,6 +139,22 @@ class Nemotron4Config15B(NemotronConfig):
 
 
 @dataclass
+class Nemotron4Config10B(NemotronConfig):
+    """
+    Configuration class for the Nemotron4 15B Config, inheriting from NemotronConfig.
+    """
+
+    num_layers: int = 40
+    seq_length: int = 16384
+    hidden_size: int = 4096
+    ffn_hidden_size: int = 16384
+    num_attention_heads: int = 48
+    num_query_groups: Optional[int] = 8
+    kv_channels: Optional[int] = 128
+    init_method_std: float = 0.0134
+
+
+@dataclass
 class Nemotron4Config340B(NemotronConfig):
     """
     Configuration class for the Nemotron4 340B Config, inheriting from NemotronConfig.
@@ -163,7 +185,12 @@ class NemotronModel(GPTModel):
         tokenizer: Optional["TokenizerSpec"] = None,
         model_transform: Optional[Callable[[nn.Module], nn.Module]] = None,
     ):
-        super().__init__(config or NemotronConfig(), optim=optim, tokenizer=tokenizer, model_transform=model_transform)
+        super().__init__(
+            config or NemotronConfig(),
+            optim=optim,
+            tokenizer=tokenizer,
+            model_transform=model_transform,
+        )
 
 
 @io.model_importer(NemotronModel, "hf")
@@ -197,8 +224,8 @@ class HFNemotronImporter(io.ModelConnector["NemotronForCausalLM", NemotronModel]
         """
         from transformers import NemotronForCausalLM
 
-        print('Start converting Nemotron model..')
-        source = NemotronForCausalLM.from_pretrained(str(self), torch_dtype='auto')
+        print("Start converting Nemotron model..")
+        source = NemotronForCausalLM.from_pretrained(str(self), torch_dtype="auto")
         target = self.init()
         trainer = self.nemo_setup(target)
         self.convert_state(source, target)
@@ -250,7 +277,9 @@ class HFNemotronImporter(io.ModelConnector["NemotronForCausalLM", NemotronModel]
                 fn=TransformFns.merge_qkv,
             ),
         ]
-        return io.apply_transforms(source, target, mapping=mapping, transforms=transforms)
+        return io.apply_transforms(
+            source, target, mapping=mapping, transforms=transforms
+        )
 
     @property
     def tokenizer(self) -> "AutoTokenizer":
@@ -260,7 +289,9 @@ class HFNemotronImporter(io.ModelConnector["NemotronForCausalLM", NemotronModel]
         Returns:
             AutoTokenizer: Tokenizer instance initialized from the HF model's tokenizer
         """
-        from nemo.collections.common.tokenizers.huggingface.auto_tokenizer import AutoTokenizer
+        from nemo.collections.common.tokenizers.huggingface.auto_tokenizer import (
+            AutoTokenizer,
+        )
 
         return AutoTokenizer(self.save_hf_tokenizer_assets(str(self)))
 
@@ -296,7 +327,9 @@ class HFNemotronImporter(io.ModelConnector["NemotronForCausalLM", NemotronModel]
             num_query_groups=source.num_key_value_heads,
             rotary_base=source.rope_theta,
             rotary_percent=source.partial_rotary_factor,
-            make_vocab_size_divisible_by=make_vocab_size_divisible_by(source.vocab_size),
+            make_vocab_size_divisible_by=make_vocab_size_divisible_by(
+                source.vocab_size
+            ),
             share_embeddings_and_output_weights=False,
             fp16=(dtype_from_hf(source) == torch.float16),
             bf16=(dtype_from_hf(source) == torch.bfloat16),
@@ -390,7 +423,9 @@ class HFNemotronExporter(io.ModelConnector[NemotronModel, "NemotronForCausalLM"]
                 fn=TransformFns.prune_padding,
             ),
         ]
-        return io.apply_transforms(source, target, mapping=mapping, transforms=transforms)
+        return io.apply_transforms(
+            source, target, mapping=mapping, transforms=transforms
+        )
 
     @property
     def tokenizer(self):
@@ -443,6 +478,7 @@ __all__ = [
     "Nemotron3Config8B",
     "Nemotron3Config22B",
     "Nemotron4Config15B",
+    "Nemotron4Config10B",
     "Nemotron4Config340B",
     "NemotronModel",
 ]

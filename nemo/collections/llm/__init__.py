@@ -18,7 +18,11 @@ from nemo.utils.import_utils import safe_import
 safe_import("transformer_engine")
 
 from nemo.collections.llm import peft
-from nemo.collections.llm.bert.data import BERTMockDataModule, BERTPreTrainingDataModule, SpecterDataModule
+from nemo.collections.llm.bert.data import (
+    BERTMockDataModule,
+    BERTPreTrainingDataModule,
+    SpecterDataModule,
+)
 from nemo.collections.llm.bert.model import (
     BertConfig,
     BertEmbeddingLargeConfig,
@@ -142,6 +146,7 @@ from nemo.collections.llm.gpt.model import (  # noqa: F401
     Nemotron3Config8B,
     Nemotron3Config22B,
     Nemotron4Config15B,
+    Nemotron4Config10B,
     Nemotron4Config340B,
     NemotronConfig,
     NemotronHConfig8B,
@@ -189,7 +194,9 @@ from nemo.collections.llm.gpt.model import (  # noqa: F401
 )
 from nemo.collections.llm.t5.data import FineTuningDataModule as T5FineTuningDataModule
 from nemo.collections.llm.t5.data import MockDataModule as T5MockDataModule
-from nemo.collections.llm.t5.data import PreTrainingDataModule as T5PreTrainingDataModule
+from nemo.collections.llm.t5.data import (
+    PreTrainingDataModule as T5PreTrainingDataModule,
+)
 from nemo.collections.llm.t5.data import SquadDataModule as T5SquadDataModule
 from nemo.collections.llm.t5.model import (
     T5Config,
@@ -250,6 +257,7 @@ __all__ = [
     "Nemotron3Config8B",
     "Nemotron3Config22B",
     "Nemotron4Config15B",
+    "Nemotron4Config10B",
     "Nemotron4Config340B",
     "NemotronConfig",
     "LlamaEmbeddingModel",

@@ -20,8 +20,12 @@ from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Union
 import lightning.pytorch as L
 import torch
 import torch.distributed
-from megatron.core.inference.model_inference_wrappers.gpt.gpt_inference_wrapper import GPTInferenceWrapper
-from megatron.core.inference.model_inference_wrappers.inference_wrapper_config import InferenceWrapperConfig
+from megatron.core.inference.model_inference_wrappers.gpt.gpt_inference_wrapper import (
+    GPTInferenceWrapper,
+)
+from megatron.core.inference.model_inference_wrappers.inference_wrapper_config import (
+    InferenceWrapperConfig,
+)
 from megatron.core.models.gpt.gpt_model import GPTModel as MCoreGPTModel
 from megatron.core.optimizer import OptimizerConfig
 from megatron.core.transformer.spec_utils import ModuleSpec
@@ -129,10 +133,10 @@ def gpt_forward_step(model, batch) -> torch.Tensor:
     }
 
     if "attention_mask" not in batch:
-        assert (
-            HAVE_TE
-        ), "The dataloader did not provide an attention mask, however Transformer Engine was not detected. \
+        assert HAVE_TE, (
+            "The dataloader did not provide an attention mask, however Transformer Engine was not detected. \
             This requires Transformer Engine's implementation of fused or flash attention."
+        )
     else:
         forward_args["attention_mask"] = batch["attention_mask"]
 
@@ -298,7 +302,9 @@ class GPTConfig(TransformerConfig, io.IOMixin):
     tp_only_amax_red: bool = False
 
     use_transformer_engine_full_layer_spec: bool = False
-    transformer_layer_spec: Union[ModuleSpec, Callable[["GPTConfig"], ModuleSpec]] = default_layer_spec
+    transformer_layer_spec: Union[ModuleSpec, Callable[["GPTConfig"], ModuleSpec]] = (
+        default_layer_spec
+    )
 
     forward_step_fn: Callable = gpt_forward_step
     data_step_fn: Callable = gpt_data_step
@@ -307,7 +313,9 @@ class GPTConfig(TransformerConfig, io.IOMixin):
     vocab_size: Optional[int] = None
     tp_comm_overlap_cfg: Optional[Union[str, dict[str, Any]]] = None
 
-    def configure_model(self, tokenizer, pre_process=None, post_process=None, vp_stage=None) -> "MCoreGPTModel":
+    def configure_model(
+        self, tokenizer, pre_process=None, post_process=None, vp_stage=None
+    ) -> "MCoreGPTModel":
         """Configure and instantiate a Megatron Core GPT model based on this configuration.
 
         Args:
@@ -327,14 +335,14 @@ class GPTConfig(TransformerConfig, io.IOMixin):
             )
 
         vp_size = self.virtual_pipeline_model_parallel_size
-        is_pipeline_asymmetric = getattr(self, "account_for_embedding_in_pipeline_split", False) or getattr(
-            self, "account_for_loss_in_pipeline_split", False
-        )
+        is_pipeline_asymmetric = getattr(
+            self, "account_for_embedding_in_pipeline_split", False
+        ) or getattr(self, "account_for_loss_in_pipeline_split", False)
         if vp_size and not is_pipeline_asymmetric:
             p_size = self.pipeline_model_parallel_size
-            assert (
-                self.num_layers // p_size
-            ) % vp_size == 0, "Make sure the number of model chunks is the same across all pipeline stages."
+            assert (self.num_layers // p_size) % vp_size == 0, (
+                "Make sure the number of model chunks is the same across all pipeline stages."
+            )
 
         from megatron.core import parallel_state
 
@@ -350,15 +358,17 @@ class GPTConfig(TransformerConfig, io.IOMixin):
                     f" {vocab_size - tokenizer.vocab_size}."
                 )
         else:
-            vocab_size = get_vocab_size(self, tokenizer.vocab_size, self.make_vocab_size_divisible_by)
+            vocab_size = get_vocab_size(
+                self, tokenizer.vocab_size, self.make_vocab_size_divisible_by
+            )
         # Initialize model as meta data instead of allocating data on a device
         model_init_device_context = contextlib.nullcontext
         if self.init_model_with_meta_device:
-            model_init_device_context = partial(torch.device, device='meta')
+            model_init_device_context = partial(torch.device, device="meta")
 
         import inspect
 
-        if 'mtp_block_spec' in inspect.signature(MCoreGPTModel.__init__).parameters:
+        if "mtp_block_spec" in inspect.signature(MCoreGPTModel.__init__).parameters:
             kwargs = {"mtp_block_spec": mtp_block_spec(self)}
         else:
             kwargs = {}
@@ -379,11 +389,10 @@ class GPTConfig(TransformerConfig, io.IOMixin):
                 rotary_base=self.rotary_base,
                 seq_len_interpolation_factor=self.seq_len_interpolation_factor,
                 pre_process=pre_process
-                or parallel_state.is_pipeline_first_stage(ignore_virtual=False, vp_stage=vp_stage),
+                or parallel_state.is_pipeline_first_stage(ignore_virtual=False),
                 post_process=post_process
-                or parallel_state.is_pipeline_last_stage(ignore_virtual=False, vp_stage=vp_stage),
+                or parallel_state.is_pipeline_last_stage(ignore_virtual=False),
                 scatter_embedding_sequence_parallel=self.scatter_embedding_sequence_parallel,
-                vp_stage=vp_stage,
                 **kwargs,
             )
 
@@ -558,7 +567,9 @@ class GPTModel(L.LightningModule, io.IOMixin, io.ConnectorMixin, fn.FNMixin):
         super().__init__()
         self.config = config
         self.tokenizer = tokenizer
-        self.optim = optim or MegatronOptimizerModule(config=OptimizerConfig(lr=1e-4, use_distributed_optimizer=True))
+        self.optim = optim or MegatronOptimizerModule(
+            config=OptimizerConfig(lr=1e-4, use_distributed_optimizer=True)
+        )
         self.optim.connect(self)  # This will bind the `configure_optimizers` method
         self.model_transform = model_transform
         self.model_context_managers = model_context_managers
@@ -576,7 +587,9 @@ class GPTModel(L.LightningModule, io.IOMixin, io.ConnectorMixin, fn.FNMixin):
                 for cm in self.model_context_managers:
                     stack.enter_context(cm)
 
-                self.module = self.config.configure_model(self.tokenizer, vp_stage=vp_stage)
+                self.module = self.config.configure_model(
+                    self.tokenizer, vp_stage=vp_stage
+                )
 
     def forward(
         self,
@@ -602,7 +615,11 @@ class GPTModel(L.LightningModule, io.IOMixin, io.ConnectorMixin, fn.FNMixin):
         Returns:
             torch.Tensor: Output tensor from the model
         """
-        extra_kwargs = {"packed_seq_params": packed_seq_params} if packed_seq_params is not None else {}
+        extra_kwargs = (
+            {"packed_seq_params": packed_seq_params}
+            if packed_seq_params is not None
+            else {}
+        )
         output_tensor = self.module(
             input_ids,
             position_ids,
@@ -689,7 +706,9 @@ class GPTModel(L.LightningModule, io.IOMixin, io.ConnectorMixin, fn.FNMixin):
                 break
             mcore_model = getattr(mcore_model, "module", None)
         if mcore_model is None or type(mcore_model) is not MCoreGPTModel:
-            raise ValueError("Exact McoreGPTModel instance not found in the model structure.")
+            raise ValueError(
+                "Exact McoreGPTModel instance not found in the model structure."
+            )
 
         vocab_size = None
         if hasattr(self.config, "vocab_size"):
@@ -710,7 +729,9 @@ class GPTModel(L.LightningModule, io.IOMixin, io.ConnectorMixin, fn.FNMixin):
             inference_max_seq_length=inference_max_seq_length,
         )
 
-        model_inference_wrapper = GPTInferenceWrapper(mcore_model, inference_wrapper_config)
+        model_inference_wrapper = GPTInferenceWrapper(
+            mcore_model, inference_wrapper_config
+        )
         return model_inference_wrapper
 
     @property
@@ -733,7 +754,9 @@ class GPTModel(L.LightningModule, io.IOMixin, io.ConnectorMixin, fn.FNMixin):
             MaskedTokenLossReduction: Loss reduction module for validation
         """
         if not self._validation_loss_reduction:
-            self._validation_loss_reduction = MaskedTokenLossReduction(validation_step=True)
+            self._validation_loss_reduction = MaskedTokenLossReduction(
+                validation_step=True
+            )
 
         return self._validation_loss_reduction
 

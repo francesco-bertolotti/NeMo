@@ -18,6 +18,7 @@ from nemo.collections.llm.gpt.model.nemotron import (
     Nemotron3Config8B,
     Nemotron3Config22B,
     Nemotron4Config15B,
+    Nemotron4Config10B,
     Nemotron4Config340B,
     NemotronConfig,
 )
@@ -94,6 +95,18 @@ def test_nemotron4_config_15b():
     assert config.num_query_groups == 8
     assert config.kv_channels == 6144 // 48
     assert config.init_method_std == 0.0134
+
+
+def test_nemotron4_config_10b():
+    config = Nemotron4Config10B()
+    assert config.num_layers == 32
+    assert config.seq_length == 4096
+    assert config.hidden_size == 4096
+    assert config.ffn_hidden_size == 16384
+    assert config.num_attention_heads == 32
+    assert config.num_query_groups == 8
+    assert config.kv_channels == 4096 // 32
+    assert config.init_method_std == 0.010
 
 
 def test_nemotron4_config_340b():
