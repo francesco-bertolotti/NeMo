@@ -29,6 +29,7 @@ from typing_extensions import Annotated
 import nemo.lightning as nl
 from nemo.collections.llm import GPTModel, HFAutoModelForCausalLM
 from nemo.collections.llm.evaluation.api import EvaluationConfig, EvaluationTarget, MisconfigurationError
+from nemo.collections.llm.gpt.model.nemotron import NemotronModel
 from nemo.collections.llm.modelopt import (
     DistillationGPTModel,
     ExportConfig,
@@ -289,7 +290,11 @@ def validate(
         model_transform=model_transform,
     )
 
-    trainer.validate(model, data)
+    # print(type(model), type(model.module))
+    if isinstance(model, NemotronModel):
+        trainer.validate(model, data)
+    else:
+        trainer.validate(model.module, data)
 
     return app_state.exp_dir
 
@@ -351,8 +356,6 @@ def prune(
     else:
         steps = num_train_samples
 
-    breakpoint()
-
     model, trainer = setup_trainer_and_restore_model_with_modelopt_spec(
         model_path=nemo_checkpoint,
         tensor_model_parallel_size=tp_size,
@@ -372,9 +375,6 @@ def prune(
     if is_global_rank_zero():
         logging.info(
             f"Model parameters after pruning: {sum(p.numel() for p in trainer.model.parameters() if p.requires_grad) / 1e9:.2f}B"
-        )
-        logging.info(
-            f"Model FLOPs after pruning: {sum(p.numel() for p in trainer.model.parameters() if p.requires_grad) / 1e12:.2f}T \n"
         )
 
     save_pruned_model(trainer, save_path)
