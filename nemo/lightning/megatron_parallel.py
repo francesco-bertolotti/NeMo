@@ -541,7 +541,7 @@ class MegatronParallel(nn.ModuleList, Generic[ModelT]):
             )
 
             if self.precision_plugin and parallel_state.is_pipeline_last_stage(
-                ignore_virtual=False, vp_stage=model.module.vp_stage
+                ignore_virtual=False,
             ):
                 output_tensor = self.precision_plugin.convert_output(output_tensor)
 

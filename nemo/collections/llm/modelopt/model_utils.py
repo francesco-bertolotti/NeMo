@@ -238,7 +238,7 @@ def setup_trainer_and_restore_model_with_modelopt_spec(
     if tokenizer_path:
         from nemo.collections.nlp.modules.common.tokenizer_utils import get_tokenizer
 
-        tokenizer = get_tokenizer(tokenizer_path)
+        tokenizer = get_tokenizer(tokenizer_path, tokenizer_model=tokenizer_path)
 
     _setup_trainer_and_restore_model(model_path, trainer, model, tokenizer)
     trainer.strategy.restore_config = None  # No need to restore model weights again

@@ -351,6 +351,8 @@ def prune(
     else:
         steps = num_train_samples
 
+    breakpoint()
+
     model, trainer = setup_trainer_and_restore_model_with_modelopt_spec(
         model_path=nemo_checkpoint,
         tensor_model_parallel_size=tp_size,
@@ -365,6 +367,16 @@ def prune(
         model_config_overrides={"sequence_parallel": False},
     )
     prune_gpt_model(model, pruning_config, data, trainer)
+
+    # Print model parameters after pruning
+    if is_global_rank_zero():
+        logging.info(
+            f"Model parameters after pruning: {sum(p.numel() for p in trainer.model.parameters() if p.requires_grad) / 1e9:.2f}B"
+        )
+        logging.info(
+            f"Model FLOPs after pruning: {sum(p.numel() for p in trainer.model.parameters() if p.requires_grad) / 1e12:.2f}T \n"
+        )
+
     save_pruned_model(trainer, save_path)
 
     console = Console()
@@ -1154,10 +1166,10 @@ def generate(
     if output_path is not None and is_global_rank_zero():
         with open(output_path, "w") as f:
             for sample, pred in zip(dataset if input_dataset else inputs, gathered_results):
-                if type(sample) == dict:
+                if type(sample) is dict:
                     sample["label"] = sample.pop("output", None)
                     sample["prediction"] = pred if text_only else pred.generated_text
-                elif type(sample) == str:
+                elif type(sample) is str:
                     sample = {"input": sample, "prediction": pred if text_only else pred.generated_text}
                 f.write(json.dumps(sample) + "\n")
         logging.info(f"Predictions written to {output_path}")
@@ -1305,7 +1317,7 @@ def _validate_config(
 
         # TP/SP validation
         if trainer.strategy.tensor_model_parallel_size == 1:
-            if trainer.strategy.sequence_parallel == True:
+            if trainer.strategy.sequence_parallel:
                 warnings.warn("Disabling sequence parallelism because tensor model parallelism is disabled")
                 trainer.strategy.sequence_parallel = False
 
