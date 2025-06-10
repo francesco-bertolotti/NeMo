@@ -379,8 +379,11 @@ def prune(
 
     save_pruned_model(trainer, save_path)
 
-    console = Console()
-    console.print(f"[green]✓ Pruning succeded, pruned checkpoint saved to {save_path}[/green]")
+    # breakpoint()
+    # trainer.model.module.save_to("logs/pruned_model.nemo")
+    trainer.save_checkpoint("logs/pruned_model.ckpt", weights_only=False)
+
+    print(f"[green]✓ Pruning succeded, pruned checkpoint saved to {save_path}[/green]")
 
     return save_path
 
@@ -450,7 +453,7 @@ def distill(
         _student_model.config,
         _teacher_model.config,
         teacher_ckpt_path=teacher_model_path,
-        distillation_config_path=distillation_config_path,
+        # distillation_config_path=distillation_config_path,
     )
     model.__io__ = _student_model.__io__
 

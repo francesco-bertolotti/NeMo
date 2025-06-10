@@ -82,6 +82,7 @@ def trainer(
         gradient_as_bucket_view=True,
         ckpt_async_save=True,
         ckpt_parallel_load=True,
+        ckpt_load_strictness=False,  # TODO
         ddp=run.Config(
             DistributedDataParallelConfig,
             check_for_nan_in_grad=True,
@@ -160,7 +161,7 @@ def distillation_recipe(
         llm.distill,
         student_model_path=student_model_path,
         teacher_model_path=teacher_model_path,
-        distillation_config_path=distillation_config_path,
+        # distillation_config_path=distillation_config_path,
         trainer=trainer(
             num_nodes=num_nodes,
             num_gpus_per_node=num_gpus_per_node,

@@ -228,7 +228,7 @@ if __name__ == "__main__":
         llm.distill(
             student_model_path=args.model_path,
             teacher_model_path=args.teacher_path,
-            distillation_config_path=args.kd_config,
+            # distillation_config_path=args.kd_config,
             data=data,
             trainer=trainer,
             log=logger,

@@ -23,7 +23,7 @@ from nemo.collections import llm
 from nemo.lightning.ckpt_utils import ckpt_to_context_subdir
 from nemo.lightning.io.pl import TrainerContext, ckpt_to_weights_subdir
 from nemo.utils import logging
-from nemo.utils.get_rank import is_global_rank_zero
+from nemo.utils.get_rank import is_global_rank_zero # noqa: F401
 from nemo.utils.import_utils import safe_import
 
 mtp, HAVE_MODELOPT = safe_import("modelopt.torch.prune")
@@ -132,7 +132,7 @@ def save_pruned_model(trainer: nl.Trainer, save_path: str) -> None:
     weight_path.mkdir(parents=True, exist_ok=True)
     dist_checkpointing.save(trainer.strategy.megatron_parallel.sharded_state_dict(), weight_path)
 
-    if is_global_rank_zero():
-        TrainerContext.from_trainer(trainer).io_dump(ckpt_to_context_subdir(save_path), yaml_attrs=["model"])
+    # if is_global_rank_zero():
+    TrainerContext.from_trainer(trainer).io_dump(ckpt_to_context_subdir(save_path), yaml_attrs=["model"])
 
     logging.info(f"Pruned model saved to {save_path}\n")
