@@ -140,6 +140,7 @@ from nemo.collections.llm.gpt.model.nemotron import (
     Nemotron3Config22B,
     Nemotron4Config15B,
     Nemotron4Config10B,
+    Nemotron4Config6B,
     Nemotron4Config340B,
     NemotronConfig,
     NemotronModel,

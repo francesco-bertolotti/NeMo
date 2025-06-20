@@ -144,14 +144,30 @@ class Nemotron4Config10B(NemotronConfig):
     Configuration class for the Nemotron4 15B Config, inheriting from NemotronConfig.
     """
 
-    num_layers: int = 40
-    seq_length: int = 16384
-    hidden_size: int = 4096
-    ffn_hidden_size: int = 16384
-    num_attention_heads: int = 48
-    num_query_groups: Optional[int] = 8
-    kv_channels: Optional[int] = 128
-    init_method_std: float = 0.0134
+    num_layers: int = 40 # 40
+    seq_length: int = 16384 # 8192
+    hidden_size: int = 4096 # 3072
+    ffn_hidden_size: int = 16384 # 9216
+    num_attention_heads: int = 48 # 48
+    num_query_groups: Optional[int] = 8 # 8
+    kv_channels: Optional[int] = 128 # 128
+    init_method_std: float = 0.0134 # 0.0134
+
+
+@dataclass
+class Nemotron4Config6B(NemotronConfig):
+    """
+    Configuration class for the Nemotron4 15B Config, inheriting from NemotronConfig.
+    """
+
+    num_layers: int = 40 # 40
+    seq_length: int = 8192
+    hidden_size: int = 3072
+    ffn_hidden_size: int = 9216
+    num_attention_heads: int = 48 # 48
+    num_query_groups: Optional[int] = 8 # 8
+    kv_channels: Optional[int] = 128 # 128
+    init_method_std: float = 0.0134 # 0.0134
 
 
 @dataclass

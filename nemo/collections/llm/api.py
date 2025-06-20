@@ -382,6 +382,9 @@ def prune(
     # breakpoint()
     # trainer.model.module.save_to("logs/pruned_model.nemo")
     trainer.save_checkpoint("logs/pruned_model.ckpt", weights_only=False)
+    # breakpoint()
+    # trainer.model.save_to("logs/pruned_model.nemo")
+
 
     print(f"[green]✓ Pruning succeded, pruned checkpoint saved to {save_path}[/green]")
 

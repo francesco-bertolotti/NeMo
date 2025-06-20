@@ -157,6 +157,7 @@ def convert(local_rank, rank, world_size, args):
     # Set precision None after precision plugins are created as PTL >= 2.1 does not allow both
     # precision plugins and precision to exist
     cfg.trainer.precision = None
+    breakpoint()
     trainer = Trainer(plugins=plugins, strategy=strategy, **cfg.trainer)
 
     app_state.pipeline_model_parallel_size = args.pipeline_model_parallel_size
@@ -198,7 +199,7 @@ def convert(local_rank, rank, world_size, args):
     logging.info(
         f'rank: {rank}, local_rank: {local_rank}, is loading checkpoint: {checkpoint_path} for tp_rank: {app_state.tensor_model_parallel_rank} and pp_rank: {app_state.pipeline_model_parallel_rank}'
     )
-
+    breakpoint()
     if args.model_type == 'gpt':
         model = MegatronGPTModel.load_from_checkpoint(
             checkpoint_path, hparams_file=args.hparams_file, trainer=trainer, load_mlm=args.convert_mlm

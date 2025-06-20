@@ -325,6 +325,7 @@ class NLPModel(ModelPT, Exportable):
         For documentation, please refer to LightningModule.load_from_checkpoin() documentation.
         """
         checkpoint = None
+        breakpoint()
         try:
             cls._set_model_restore_state(is_being_restored=True)
 
@@ -380,6 +381,7 @@ class NLPModel(ModelPT, Exportable):
                     new_state_dict[new_key] = checkpoint['state_dict'][key]
                 checkpoint['state_dict'] = new_state_dict
 
+            breakpoint()
             if 'cfg' in kwargs:
                 model = ptl_load_state(cls, checkpoint, strict=strict, **kwargs)
             else:
@@ -414,6 +416,7 @@ class NLPModel(ModelPT, Exportable):
                     checkpoint['state_dict'] = mlm_sharded_state_dict
                 else:
                     checkpoint['state_dict'] = sharded_state_dict
+                breakpoint()
                 # load the checkpoint from disk
                 checkpoint = dist_checkpointing.load(sharded_state_dict=checkpoint, checkpoint_dir=checkpoint_dir)
                 # restore the weights
